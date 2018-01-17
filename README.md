@@ -1,7 +1,7 @@
 scrypt
 ======
 
-The [scrypt](https://en.wikipedia.org/wiki/Scrypt) password-base key derivation function (pkbdf) is an algorithm designed to be brute-force resistant that converts human readable passwords into fixed length arrays of bytes, which can then be used as a key for symetric block ciphers, private keys, et cetera.
+The [scrypt](https://en.wikipedia.org/wiki/Scrypt) password-base key derivation function (pbkdf) is an algorithm designed to be brute-force resistant that converts human readable passwords into fixed length arrays of bytes, which can then be used as a key for symetric block ciphers, private keys, et cetera.
 
 ### Features:
 - **Non-blocking** - Gives other events in the event loop opportunities to run (asynchrorous)
