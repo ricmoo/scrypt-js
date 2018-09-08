@@ -35,7 +35,6 @@
         "dkLen": 64,
         "derivedKey": "2101cb9b6a511aaeaddbbe09cf70f881ec568d574a2ffd4dabe5ee9820adaa478e56fd8f4ba5d09ffa1c6d927c40f4c337304049e8a952fbcbf45c6fa77a41a4"
     },
-
     {
         "password": "70617373776f7264",
         "salt": "7269636d6f6f",
@@ -44,6 +43,14 @@
         "r": "8",
         "dkLen": "32",
         "derivedKey": "e286ed0298808c0b4bb4272ce947091b0da06bb530c4cbab3923e44ff48bbc25"
+    },
+    {
+        "password": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "salt": "",
+        "N": 16,
+        "p": 1,
+        "r": 1,
+        "dkLen": 64,
+        "derivedKey": "563c6b92a82ab6e4d743241d02c787020b2376df98699893da03eebace365b358b2badb4f81a1cd3d01cc039338774bb6ebafbfa81108d7dea3dec721f12dfaf"
     }
-
 ]
