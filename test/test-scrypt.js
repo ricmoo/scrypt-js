@@ -15,7 +15,7 @@ function makeTest(options) {
     var derivedKeyHex = options.derivedKey;
 
     return function (test) {
-        scrypt(password, salt, N, r, p, dkLen, function(error, progress, key) {
+        scrypt(password, salt, N, r, p, dkLen, true, function(error, progress, key) {
             if (error) {
                 console.log(error);
 

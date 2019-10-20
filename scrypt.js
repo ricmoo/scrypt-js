@@ -258,10 +258,11 @@
     }
 
     // N = Cpu cost, r = Memory cost, p = parallelization cost
+    // bool asyncFunc: true: requires the callback, false: does not require callback, returns key
     // callback(error, progress, key)
-    function scrypt(password, salt, N, r, p, dkLen, callback) {
+    function scrypt(password, salt, N, r, p, dkLen, asyncFunc, callback) {
 
-        if (!callback) { throw new Error('missing callback'); }
+        if (!callback && asyncFunc) { throw new Error('missing callback'); }
 
         N = ensureInteger(N, 'N');
         r = ensureInteger(r, 'r');
@@ -319,12 +320,15 @@
         var limit = parseInt(1000 / r);
 
         // Trick from scrypt-async; if there is a setImmediate shim in place, use it
-        var nextTick = (typeof(setImmediate) !== 'undefined') ? setImmediate : setTimeout;
+        var nextTick;
+        if (asyncFunc) {
+            nextTick = (typeof (setImmediate) !== 'undefined') ? setImmediate : setTimeout;
+        }
 
         // This is really all I changed; making scryptsy a state machine so we occasionally
         // stop and give other evnts on the evnt loop a chance to run. ~RicMoo
         var incrementalSMix = function() {
-            if (stop) {
+            if (stop && asyncFunc) {
                 return callback(new Error('cancelled'), currentOp / totalOps);
             }
 
@@ -356,7 +360,7 @@
 
                     // Call the callback with the progress (optionally stopping us)
                     var percent10 = parseInt(1000 * currentOp / totalOps);
-                    if (percent10 !== lastPercent10) {
+                    if (percent10 !== lastPercent10 && asyncFunc) {
                         stop = callback(null, currentOp / totalOps);
                         if (stop) { break; }
                         lastPercent10 = percent10;
@@ -389,7 +393,7 @@
 
                     // Call the callback with the progress (optionally stopping us)
                     var percent10 = parseInt(1000 * currentOp / totalOps);
-                    if (percent10 !== lastPercent10) {
+                    if (percent10 !== lastPercent10 && asyncFunc) {
                         stop = callback(null, currentOp / totalOps);
                         if (stop) { break; }
                         lastPercent10 = percent10;
@@ -410,8 +414,8 @@
 
                     b = [];
                     for (var i = 0; i < B.length; i++) {
-                        b.push((B[i] >>  0) & 0xff);
-                        b.push((B[i] >>  8) & 0xff);
+                        b.push((B[i] >> 0) & 0xff);
+                        b.push((B[i] >> 8) & 0xff);
                         b.push((B[i] >> 16) & 0xff);
                         b.push((B[i] >> 24) & 0xff);
                     }
@@ -419,15 +423,24 @@
                     var derivedKey = PBKDF2_HMAC_SHA256_OneIter(password, b, dkLen);
 
                     // Done; don't break (which would reschedule)
-                    return callback(null, 1.0, derivedKey);
+                    if (asyncFunc) {
+                        return callback(null, 1.0, derivedKey);
+                    } else {
+                        return derivedKey;
+                    }
+                    
                 }
 
-                // Schedule the next steps
-                nextTick(incrementalSMix);
+                    // Schedule the next steps
+                if (asyncFunc) {
+                    nextTick(incrementalSMix);
+                } else {
+                    return incrementalSMix();
+                }
             }
 
             // Bootstrap the incremental smix
-            incrementalSMix();
+            return incrementalSMix();
     }
 
     // node.js

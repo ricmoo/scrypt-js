@@ -7,15 +7,18 @@ The [scrypt](https://en.wikipedia.org/wiki/Scrypt) password-base key derivation 
 - **Non-blocking** - Gives other events in the event loop opportunities to run (asynchronous)
 - **Cancellable** - If the key is no longer required, the computation can be cancelled
 - **Progress Callback** - Provides the current progress of key derivation as a percentage complete
+- **Optionally: synchronous without callback** - Set the parameter "asyncFunc" to false, if you want 
+to run the scrypt synchronously. Then, there is no need for a callback, you will receive the key as a return value.
+
 
 
 Tuning
 ------
 
 The scrypt algorithm is, by design, expensive to execute, which increases the amount of time an attacker requires in order to brute force guess a password, adjustable by several parameters which can be tuned:
-- **N** - The CPU/memory cost; increasing this increases the overall difficulty
-- **r** - The block size; increasing this increases the dependency on memory latency and bandwidth
-- **p** - The parallelization cost; increasing this increases the dependency on multi-processing
+- **N** - The CPU/memory cost; increasing this increases the overall difficulty (default 14)
+- **r** - The block size; increasing this increases the dependency on memory latency and bandwidth (default 8)
+- **p** - The parallelization cost; increasing this increases the dependency on multi-processing (default 1)
 
 
 
@@ -60,7 +63,7 @@ API
       var N = 1024, r = 8, p = 1;
       var dkLen = 32;
 
-      scrypt(password, salt, N, r, p, dkLen, function(error, progress, key) {
+      scrypt(password, salt, N, r, p, dkLen, true, function(error, progress, key) {
         if (error) {
           console.log("Error: " + error);
 

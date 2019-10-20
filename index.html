@@ -142,7 +142,7 @@
                     <div>
                         <div class="param">
                             <div><b>Nlog2</b> [1, 63]</div>
-                            <input id="pbkdf-Nlog2" type="text" value="10" />
+                            <input id="pbkdf-Nlog2" type="text" value="14" />
                         </div>
                         <div class="param">
                             <div><b>r</b></div>
@@ -158,7 +158,9 @@
                         </div>
                     </div>
                     <div class="clearfix"></div>
-                    <input id="pbkdf-submit" type="submit" value="Compute scrypt" />
+                    <input id="pbkdf-submit-async" type="submit" value="Compute scrypt asynchronously" />
+                    <input id="pbkdf-submit-sync" type="submit" value="Compute scrypt synchronously" />
+
                     <div class="progress"><div id="progressBar"></div><div id="progressAmount">0%</div></div>
                     <div id="result"></div>
                 </div>
@@ -219,10 +221,12 @@
                 }
             })();
 
-            var submit = get('pbkdf-submit');
+            var submitAsync = get('pbkdf-submit-async');
+            var submitSync = get('pbkdf-submit-sync');
 
             var done = null;
-            submit.onclick = function() {
+
+            submitAsync.onclick = function() {
                 if (done === null) {
                     clearConsole();
 
@@ -244,14 +248,14 @@
                         return;
                     }
 
-                    submit.classList.add('cancel');
-                    submit.value = "Cancel scrypt";
+                    submitAsync.classList.add('cancel');
+                    submitAsync.value = "Cancel scrypt";
 
                     printConsole('Started: N=' + N + ', r=' + r + ' p=' + p +
                         ', password=0x' + password.toString('hex') + ', salt=0x' + salt.toString('hex'));
 
                     var t0 = (new Date()).getTime();
-                    scrypt(password, salt, N, r, p, dkLen, function(error, progress, key) {
+                    scrypt(password, salt, N, r, p, dkLen, true, function(error, progress, key) {
 
                         if (error) {
                             printConsole("Cancelled: " + parseInt(100 * progress) + "% done");
@@ -263,8 +267,8 @@
                         }
 
                         if (error || key) {
-                            submit.classList.remove('cancel');
-                            submit.value = "Compute scrypt";
+                            submitAsync.classList.remove('cancel');
+                            submitAsync.value = "Compute scrypt asynchronously";
 
                             done = null;
                             progress = 0;
@@ -276,6 +280,46 @@
                         get('progressBar').style.width = parseInt(100 * progress) + '%';
                         get('progressAmount').innerHTML = parseInt(100 * progress) + '%';
                     });
+
+                } else if (done === false) {
+                    done = true;
+                }
+            };
+
+            submitSync.onclick = function() {
+                if (done === null) {
+                    clearConsole();
+
+                    done = false;
+
+                    try {
+                        var password = normalized('password'); //get('pbkdf-password').value;
+                        var salt = normalized('salt');// get('pbkdf-salt').value;
+                        var N = 1 << parseInt(get('pbkdf-Nlog2').value);
+                        var r = get('pbkdf-r').value;
+                        var p = get('pbkdf-p').value;
+                        var dkLen = get('pbkdf-dkLen').value;
+                        console.log(password, salt, N, r, p)
+
+                    } catch (error) {
+                        printConsole(error.message);
+
+                        done = null;
+                        return;
+                    }
+
+                    printConsole('Started: N=' + N + ', r=' + r + ' p=' + p +
+                        ', password=0x' + password.toString('hex') + ', salt=0x' + salt.toString('hex'));
+
+                    var t0 = (new Date()).getTime();
+
+
+                    
+                    var key = scrypt(password, salt, N, r, p, dkLen, false);
+                    key = new buffer.SlowBuffer(key);
+                    printConsole("Generated: " + key.toString('hex'));
+                    printConsole("Complete: " + (((new Date()).getTime() - t0) / 1000) + 's');
+                    done = null;
 
                 } else if (done === false) {
                     done = true;
