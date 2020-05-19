@@ -40,7 +40,7 @@ npm install scrypt-js
 **browser**
 
 ```html
-<script src="https://raw.githubusercontent.com/ricmoo/scrypt-js/master/scrypt.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/scrypt-js/scrypt.js"></script>
 ```
 
 API
