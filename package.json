@@ -1,5 +1,5 @@
 {
-  "name": "scrypt-js",
+  "name": "scrypt-js-webcrypto",
   "version": "3.0.1",
   "description": "The scrypt password-based key derivation function with sync and cancellable async.",
   "main": "scrypt.js",
@@ -21,7 +21,7 @@
   "author": "Richard Moore <me@ricmoo.com>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ricmoo/scrypt-js.git"
+    "url": "git://github.com/webmaster128/scrypt-js-webcrypto.git"
   },
   "license": "MIT"
 }
