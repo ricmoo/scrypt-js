@@ -6,6 +6,20 @@ const scrypt = require('../scrypt.js');
 
 const testVectors = require('./test-vectors.json');
 
+for (const invalid of [NaN, Infinity, -Infinity, 0.5, null]) {
+  for (let i = 0; i < 4; i++) {
+    const password = Buffer.from('password');
+    const salt = Buffer.from('salt');
+    const argname = ['N', 'r', 'p', 'dkLen'][i];
+    const args = [16, 1, 1, 64];
+    args[i] = invalid;
+    it(`Test ${invalid} rejection ${i}`, () => assert.rejects(
+      () => scrypt.scrypt(password, salt, ...args, () => {}),
+      { message: `invalid ${argname}` }
+    ));
+  }
+}
+
 for (let i = 0; i < testVectors.length; i++) {
     const test = testVectors[i];
 
