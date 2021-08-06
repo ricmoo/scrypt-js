@@ -251,7 +251,7 @@
     }
 
     function ensureInteger(value, name) {
-        if (typeof(value) !== "number" || (value % 1)) { throw new Error('invalid ' + name); }
+        if (!Number.isInteger(value)) { throw new Error('invalid ' + name); }
         return value;
     }
 
